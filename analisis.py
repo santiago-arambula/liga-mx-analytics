@@ -2,6 +2,14 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 
+from datetime import datetime
+
+fecha_actualizacion = datetime.today().strftime('%d/%m/%Y')
+jornada = 23  # cambia este número cada vez que actualices
+
+print(f"Análisis Liga MX - Jornada {jornada} | Actualizado: {fecha_actualizacion}")
+print("-" * 50)
+
 # Cargar datos reales de FBref
 df = pd.read_csv('data_ligamx.csv', skiprows=1)
 
