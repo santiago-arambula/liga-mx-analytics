@@ -40,7 +40,7 @@ df['Goles_por_partido'] = (df['Goles'] / df['Partidos']).round(2)
 df['Contribuciones'] = df['Goles'] + df['Asistencias']
 
 # Mostrar top 10 por contribuciones
-top10 = df.nlargest(10, 'Contribuciones')
+top10 = df[df['Partidos'] >= 10].nlargest(10, 'Contribuciones')
 print(top10[['Jugador', 'Equipo', 'Goles', 'Asistencias', 'Contribuciones', 'Goles_por_partido']])
 
 plt.figure(figsize=(12, 7))
@@ -88,3 +88,35 @@ posiciones = df[df['Partidos'] >= 8].groupby('Posicion').apply(
     lambda x: x.nlargest(3, 'Indice_valor')[['Jugador', 'Equipo', 'Contribuciones', 'Indice_valor']]
 ).reset_index(drop=True)
 print(posiciones.to_string())
+
+# Visualización top 3 por posición
+fig, axes = plt.subplots(2, 3, figsize=(20, 12))
+fig.suptitle('Top 3 Jugadores por Posición - Liga MX Clausura 2026', fontsize=14, fontweight='bold')
+
+posiciones_lista = df[df['Partidos'] >= 8]['Posicion'].unique()
+traduccion_posiciones = {
+    'FW': 'Delantero',
+    'MF': 'Mediocampista', 
+    'DF': 'Defensa',
+    'GK': 'Portero',
+    'MF,FW': 'Mediocampista/Delantero',
+    'FW,MF': 'Delantero/Mediocampista',
+    'DF,MF': 'Defensa/Mediocampista',
+    'MF,DF': 'Mediocampista/Defensa',
+    'DF,FW': 'Defensa/Delantero'
+}
+
+for i, pos in enumerate(posiciones_lista[:6]):
+    ax = axes[i//3][i%3]
+    data_pos = df[(df['Partidos'] >= 8) & (df['Posicion'] == pos)].nlargest(3, 'Indice_valor')
+    
+    if len(data_pos) > 0:
+        sns.barplot(data=data_pos, x='Indice_valor', y='Jugador', 
+                   palette='Blues_r', ax=ax)
+        ax.set_title(traduccion_posiciones.get(pos, pos))
+        ax.set_xlabel('Índice de Valor')
+        ax.set_ylabel('')
+
+plt.tight_layout(pad=3.0)
+plt.subplots_adjust(left=0.15)
+plt.show()
